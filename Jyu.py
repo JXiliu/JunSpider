@@ -55,6 +55,7 @@ class JianYuSpider(object):
         self.user = 'root'
         self.password = None
         self.db = None
+        self.table_name = None
         self.charset = 'utf8'
 
         if os.path.exists('schedule/') == False:
@@ -84,7 +85,7 @@ class JianYuSpider(object):
                              charset=self.charset)
         cursor = db.cursor()
 
-        sql = "INSERT INTO jianyu_IT_copy1(title,publishtime,city,money,buyerclass,s_subscopeclass,toptype,subtype,url) values(%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        sql = f"INSERT INTO {self.table_name}(title,publishtime,city,money,buyerclass,s_subscopeclass,toptype,subtype,url) values(%s, %s, %s, %s, %s, %s, %s, %s, %s)"
         for data in datalist:
             try:
                 cursor.execute(sql, tuple(data))
@@ -266,7 +267,7 @@ class JianYuSpider(object):
             elif start_runtime - now_runtime2 > 480:
                 depth_sleep = round(random.uniform(100.0, 130.0), 1)
                 if self.printf == True:
-                    print(f'====跑累了，坐会{depth_sleep}秒=====\n')
+                    print(f'====跑累了，歇会{depth_sleep}秒=====\n')
                 time.sleep(depth_sleep)
                 now_runtime2 = time.time()
 
@@ -282,7 +283,6 @@ def TimedTask(function,args:list = None,hour=8,minute=30):
     :param minute:分钟 (int or str)
     """
     scheduler = BlockingScheduler()
-    # 在每天22点30分 运行一次 function 方法
     scheduler.add_job(function, 'cron', hour=hour, minute=minute, args=args)
     scheduler.start()
 
